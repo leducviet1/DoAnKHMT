@@ -1,0 +1,16 @@
+package com.example.librarymanage_be.service;
+
+import com.example.librarymanage_be.dto.request.BorrowRequest;
+import com.example.librarymanage_be.dto.response.BorrowResponse;
+import com.example.librarymanage_be.model.Borrow;
+import com.example.librarymanage_be.model.BorrowDetail;
+
+import java.util.List;
+
+public interface  BorrowService {
+    BorrowResponse toResponse(Borrow borrow, List<BorrowDetail> details);
+    BorrowResponse borrowBooks(BorrowRequest borrowRequest);
+    BorrowResponse returnBooks(Integer borrowId);
+    Borrow findById(Integer borrowId);
+
+}
