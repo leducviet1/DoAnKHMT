@@ -10,7 +10,9 @@ import java.util.List;
 public interface  BorrowService {
     BorrowResponse toResponse(Borrow borrow, List<BorrowDetail> details);
     BorrowResponse borrowBooks(BorrowRequest borrowRequest);
-    BorrowResponse returnBooks(Integer borrowId);
+    void returnBook(Integer borrowDetailId);
+    BorrowResponse returnAllBooks(Integer borrowId);
     Borrow findById(Integer borrowId);
+
 
 }

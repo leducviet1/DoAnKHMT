@@ -13,6 +13,7 @@ public interface AuthorService {
     Page<AuthorResponse> getAuthors(Pageable pageable);
     AuthorResponse update(Integer authorId,AuthorRequest authorRequest);
     void delete(Integer authorId);
-    Author findById(Integer authorId);
+    Author findAuthorById(Integer authorId);
+    AuthorResponse findById(Integer authorId);
     List<Author> findAllById(List<Integer> authorIds);
 }

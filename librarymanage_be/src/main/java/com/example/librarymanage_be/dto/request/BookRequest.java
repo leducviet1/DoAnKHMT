@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.List;
 @Data
 @Builder
@@ -19,6 +20,8 @@ public class BookRequest {
     private String title;
     @NotNull(message = "Phải có tổng số lượng sách")
     private Integer totalQuantity;
+
+    private BigDecimal price;
 
     private Integer availableQuantity;
 

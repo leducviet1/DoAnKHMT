@@ -1,20 +1,23 @@
 package com.example.librarymanage_be.service;
 
+import com.example.librarymanage_be.config.FineConfig;
 import com.example.librarymanage_be.dto.request.BorrowItemRequest;
 import com.example.librarymanage_be.dto.request.BorrowRequest;
 import com.example.librarymanage_be.dto.response.BorrowDetailResponse;
 import com.example.librarymanage_be.dto.response.BorrowResponse;
+import com.example.librarymanage_be.enums.BorrowDetailStatus;
 import com.example.librarymanage_be.enums.BorrowStatus;
-import com.example.librarymanage_be.model.Book;
-import com.example.librarymanage_be.model.Borrow;
-import com.example.librarymanage_be.model.BorrowDetail;
-import com.example.librarymanage_be.model.User;
+import com.example.librarymanage_be.enums.FineStatus;
+import com.example.librarymanage_be.enums.FineType;
+import com.example.librarymanage_be.model.*;
 import com.example.librarymanage_be.repo.BorrowDetailRepository;
 import com.example.librarymanage_be.repo.BorrowRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,31 +74,69 @@ public class BorrowServiceImpl implements BorrowService {
             detail.setBook(book);
             detail.setQuantity(itemRequest.getQuantity());
             detail.setNote(itemRequest.getNote());
+            detail.setStatus(BorrowDetailStatus.BORROWING);
             details.add(detail);
         }
         borrowDetailRepository.saveAll(details);
-        return toResponse(borrow,details);
+        return toResponse(borrow, details);
     }
 
-
     @Override
-    public BorrowResponse returnBooks(Integer borrowId) {
-        Borrow borrowExisted = findById(borrowId);
-        if(borrowExisted.getStatus().equals(BorrowStatus.RETURNED)) {
+    public void returnBook(Integer borrowDetailId) {
+        BorrowDetail detail = borrowDetailRepository.findById(borrowDetailId).orElseThrow(() -> new RuntimeException("Not found"));
+        if (detail.getStatus().equals(BorrowStatus.RETURNED)) {
             throw new RuntimeException("Sách đã trả");
         }
+        Book book = detail.getBook();
+        book.setAvailableQuantity(book.getAvailableQuantity() + detail.getQuantity());
+        detail.setStatus(BorrowDetailStatus.RETURNED);
+        detail.setReturnDate(LocalDateTime.now());
+        //Số ngày trễ
+        long lateDays = 0;
+        if (LocalDateTime.now().isAfter(detail.getReturnDate())) {
+            lateDays = ChronoUnit.DAYS.between(detail.getReturnDate(), LocalDateTime.now());
+        }
+        if (lateDays > 0) {
+            BigDecimal amount = BigDecimal.valueOf(lateDays).multiply(FineConfig.LATE_FEE_PER_DAY);
+            Fine fine = new Fine();
+            fine.setAmount(amount);
+            fine.setBorrowDetail(detail);
+            fine.setType(FineType.LATE);
+            fine.setStatus(FineStatus.PENDING);
+            fine.setReason("Trả muộn:" + lateDays + " ngày");
+            fine.setCreatedAt(LocalDateTime.now());
+        }
+        borrowDetailRepository.save(detail);
+        Borrow borrow = detail.getBorrow();
+        boolean allReturned = borrow.getDetails().stream().allMatch(d -> d.getReturnDate() != null);
+        if (allReturned) {
+            borrow.setStatus(BorrowStatus.RETURNED);
+            borrow.setReturnDate(LocalDateTime.now());
+            borrowRepository.save(borrow);
+        }
+    }
+
+    @Override
+    public BorrowResponse returnAllBooks(Integer borrowId) {
+        Borrow borrow = findById(borrowId);
+        if (borrow.getStatus().equals(BorrowStatus.RETURNED)) {
+            throw new RuntimeException("Phiếu này đã trả");
+        }
         List<BorrowDetail> details = borrowDetailRepository.findByBorrow_BorrowId(borrowId);
-        for(BorrowDetail detail : details) {
+        for (BorrowDetail detail : details) {
             Book book = detail.getBook();
             book.setAvailableQuantity(book.getAvailableQuantity() + detail.getQuantity());
+            detail.setReturnDate(LocalDateTime.now());
+            detail.setStatus(BorrowDetailStatus.RETURNED);
         }
-        borrowExisted.setReturnDate(LocalDateTime.now());
-        borrowExisted.setStatus(BorrowStatus.RETURNED);
-        borrowRepository.save(borrowExisted);
-        return toResponse(borrowExisted,details);
+        borrow.setReturnDate(LocalDateTime.now());
+        borrow.setStatus(BorrowStatus.RETURNED);
+        borrowRepository.save(borrow);
+        return toResponse(borrow, details);
     }
+
     @Override
     public Borrow findById(Integer borrowId) {
-        return borrowRepository.findById(borrowId).orElseThrow(()-> new RuntimeException("Không tim thấy phiếu mượn:" + borrowId));
+        return borrowRepository.findById(borrowId).orElseThrow(() -> new RuntimeException("Không tim thấy phiếu mượn:" + borrowId));
     }
 }

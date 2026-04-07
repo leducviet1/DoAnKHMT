@@ -12,6 +12,7 @@ public interface BookMapper {
     @Mapping(target = "category",ignore = true)
     @Mapping(target = "publisher",ignore = true)
     @Mapping(target = "bookAuthors",ignore = true)
+    @Mapping(target = "price", ignore = true)
     @Mapping(target = "availableQuantity", ignore = true)
     Book toEntity(BookRequest bookRequest);
 

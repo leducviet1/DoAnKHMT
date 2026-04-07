@@ -1,8 +1,11 @@
 package com.example.librarymanage_be.model;
 
+import com.example.librarymanage_be.enums.BorrowDetailStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "borrow_details")
@@ -24,5 +27,10 @@ public class BorrowDetail {
 
     private Integer quantity;
     private String note;
+
+    @Enumerated(EnumType.STRING)
+    private BorrowDetailStatus status;
+
+    private LocalDateTime returnDate;
 
 }

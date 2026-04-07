@@ -31,6 +31,7 @@ public class BookServiceImpl implements BookService {
     public BookResponse create(BookRequest bookRequest) {
         Book bookMap = bookMapper.toEntity(bookRequest);
         bookMap.setAvailableQuantity(bookRequest.getTotalQuantity());
+        bookMap.setPrice(bookRequest.getPrice());
         if (bookMap.getAvailableQuantity() > 0) {
             bookMap.setBookStatus(BookStatus.AVAILABLE);
         } else {
@@ -105,6 +106,7 @@ public class BookServiceImpl implements BookService {
             }).toList();
             bookAuthorRepository.saveAll(bookAuthors);
         }
+        bookExist.setPrice(bookRequest.getPrice());
         if (bookRequest.getTotalQuantity() != null) {
             Integer borrowed = bookExist.getTotalQuantity() - bookExist.getAvailableQuantity();
             bookExist.setTotalQuantity(bookRequest.getTotalQuantity());

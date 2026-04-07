@@ -4,6 +4,7 @@ import com.example.librarymanage_be.enums.BookStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -17,6 +18,7 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer bookId;
     private String title;
+    private BigDecimal price;
     private Integer totalQuantity;
     private Integer availableQuantity;
     private String description;

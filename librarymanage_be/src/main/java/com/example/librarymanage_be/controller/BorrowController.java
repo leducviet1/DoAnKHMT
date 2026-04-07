@@ -18,8 +18,13 @@ public class BorrowController {
             @RequestBody BorrowRequest request) {
         return ResponseEntity.ok(borrowService.borrowBooks(request));
     }
-    @PutMapping("/return/{id}")
-    public ResponseEntity<BorrowResponse> returnBooks(@PathVariable Integer id) {
-        return ResponseEntity.ok(borrowService.returnBooks(id));
+    @PostMapping("/return-all/{borrowId}")
+    public ResponseEntity<BorrowResponse> returnBooks(@PathVariable Integer borrowId) {
+        return ResponseEntity.ok(borrowService.returnAllBooks(borrowId));
+    }
+    @PostMapping("/return-item/{borrowDetailId}")
+    public ResponseEntity<BorrowResponse> returnBook(@PathVariable Integer borrowDetailId) {
+        borrowService.returnBook(borrowDetailId);
+        return ResponseEntity.ok().build();
     }
 }

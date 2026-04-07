@@ -33,7 +33,7 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public AuthorResponse update(Integer authorId, AuthorRequest authorRequest) {
-        Author authorExist = findById(authorId);
+        Author authorExist = findAuthorById(authorId);
         authorMapper.updateEntity(authorRequest,authorExist);
         Author authorUpdated = authorRepository.save(authorExist);
         return authorMapper.toResponse(authorUpdated);
@@ -41,16 +41,23 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public void delete(Integer authorId) {
-        Author authorExist = findById(authorId);
+        Author authorExist = findAuthorById(authorId);
         authorRepository.delete(authorExist);
     }
 
     @Override
-    public Author findById(Integer authorId) {
-        Author authorExist = authorRepository.findById(authorId).
+    public Author findAuthorById(Integer authorId) {
+        return authorRepository.findById(authorId).
                 orElseThrow(()-> new RuntimeException("Author Not Found"));
-        return authorExist;
+
     }
+
+    @Override
+    public AuthorResponse findById(Integer authorId) {
+        Author author = findAuthorById(authorId);
+        return authorMapper.toResponse(author);
+    }
+
 
     @Override
     public List<Author> findAllById(List<Integer> authorIds) {
