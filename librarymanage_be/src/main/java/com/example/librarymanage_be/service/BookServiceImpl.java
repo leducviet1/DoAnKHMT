@@ -25,44 +25,39 @@ public class BookServiceImpl implements BookService {
     private final CategoryService categoryService;
     private final PublisherService publisherService;
     private final BookAuthorRepository bookAuthorRepository;
-@Override
 
-public BookResponse create(BookRequest bookRequest) {
+    @Override
 
-    Book bookMap = bookMapper.toEntity(bookRequest);
+    public BookResponse create(BookRequest bookRequest) {
+        Book bookMap = bookMapper.toEntity(bookRequest);
+        bookMap.setAvailableQuantity(bookRequest.getTotalQuantity());
+        if (bookMap.getAvailableQuantity() > 0) {
+            bookMap.setBookStatus(BookStatus.AVAILABLE);
+        } else {
+            bookMap.setBookStatus(BookStatus.INACTIVE);
+        }
+        bookMap.setCategory(categoryService.findById(bookRequest.getCategoryId()));
+        bookMap.setPublisher(publisherService.findById(bookRequest.getPublisherId()));
 
-    bookMap.setAvailableQuantity(bookRequest.getTotalQuantity());
-    if(bookMap.getAvailableQuantity() > 0){
-        bookMap.setBookStatus(BookStatus.AVAILABLE);
-    }else {
-        bookMap.setBookStatus(BookStatus.INACTIVE);
+        List<Integer> authorIds = bookRequest.getAuthorIds()
+                .stream()
+                .distinct()
+                .toList();
+
+        List<Author> authors = authorService.findAllById(authorIds);
+
+        List<BookAuthor> bookAuthors = authors.stream()
+                .map(author -> {
+                    BookAuthor ba = new BookAuthor();
+                    ba.setBook(bookMap);
+                    ba.setAuthor(author);
+                    return ba;
+                })
+                .toList();
+        bookMap.setBookAuthors(bookAuthors);
+        Book savedBook = bookRepository.save(bookMap);
+        return bookMapper.toResponse(savedBook);
     }
-    bookMap.setCategory(categoryService.findById(bookRequest.getCategoryId()));
-    bookMap.setPublisher(publisherService.findById(bookRequest.getPublisherId()));
-
-    Book savedBook = bookRepository.save(bookMap);
-
-    List<Integer> authorIds = bookRequest.getAuthorIds()
-            .stream()
-            .distinct()
-            .toList();
-
-    List<Author> authors = authorService.findAllById(authorIds);
-
-    List<BookAuthor> bookAuthors = authors.stream()
-            .map(author -> {
-                BookAuthor ba = new BookAuthor();
-                ba.setBook(savedBook);
-                ba.setAuthor(author);
-                return ba;
-            })
-            .toList();
-
-    //save bookauthor riêng
-    bookAuthorRepository.saveAll(bookAuthors);
-
-    return bookMapper.toResponse(savedBook);
-}
 
     @Override
     public Page<BookResponse> getBooks(Pageable pageable) {
@@ -72,26 +67,27 @@ public BookResponse create(BookRequest bookRequest) {
 
     @Override
     public BookResponse findById(Integer id) {
-        Book book = bookRepository.findById(id).orElseThrow(()->new RuntimeException("Book not found with id: " + id));
+        Book book = bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
         return bookMapper.toResponse(book);
     }
+
     @Override
-    public Book findBookById(Integer id){
-        return bookRepository.findById(id).orElseThrow(()->new RuntimeException("Book not found with id: " + id));
+    public Book findBookById(Integer id) {
+        return bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
     }
 
     @Override
     public BookResponse update(Integer bookId, BookRequest bookRequest) {
         Book bookExist = findBookById(bookId);
-        bookMapper.updateBook(bookExist,bookRequest);
-        if(bookRequest.getCategoryId() != null){
+        bookMapper.updateBook(bookExist, bookRequest);
+        if (bookRequest.getCategoryId() != null) {
             bookExist.setCategory(categoryService.findById(bookRequest.getCategoryId()));
         }
-        if(bookRequest.getPublisherId() != null){
+        if (bookRequest.getPublisherId() != null) {
             bookExist.setPublisher(publisherService.findById(bookRequest.getPublisherId()));
         }
 
-        if(bookRequest.getAuthorIds() != null){
+        if (bookRequest.getAuthorIds() != null) {
 
             List<Integer> authorIds = bookRequest.getAuthorIds()
                     .stream()
@@ -109,13 +105,13 @@ public BookResponse create(BookRequest bookRequest) {
             }).toList();
             bookAuthorRepository.saveAll(bookAuthors);
         }
-        if(bookRequest.getTotalQuantity() != null){
+        if (bookRequest.getTotalQuantity() != null) {
             Integer borrowed = bookExist.getTotalQuantity() - bookExist.getAvailableQuantity();
             bookExist.setTotalQuantity(bookRequest.getTotalQuantity());
             bookExist.setAvailableQuantity(bookRequest.getTotalQuantity() - borrowed);
-            if(bookExist.getAvailableQuantity() > 0){
+            if (bookExist.getAvailableQuantity() > 0) {
                 bookExist.setBookStatus(BookStatus.AVAILABLE);
-            }else  {
+            } else {
                 bookExist.setBookStatus(BookStatus.OUT_OF_STOCK);
             }
         }

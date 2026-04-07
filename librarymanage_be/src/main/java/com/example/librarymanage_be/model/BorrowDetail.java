@@ -8,15 +8,16 @@ import lombok.Setter;
 @Table(name = "borrow_details")
 @Getter
 @Setter
-@IdClass(BorrowDetailId.class)
 public class BorrowDetail {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "borrow_id")
     private Borrow borrow;
 
-    @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id")
     private Book book;
