@@ -4,18 +4,18 @@ import com.example.librarymanage_be.dto.request.BookRequest;
 import com.example.librarymanage_be.dto.response.BookResponse;
 import com.example.librarymanage_be.enums.BookStatus;
 import com.example.librarymanage_be.mapper.BookMapper;
-import com.example.librarymanage_be.model.Author;
-import com.example.librarymanage_be.model.Book;
-import com.example.librarymanage_be.model.BookAuthor;
+import com.example.librarymanage_be.Entity.Author;
+import com.example.librarymanage_be.Entity.Book;
+import com.example.librarymanage_be.Entity.BookAuthor;
 import com.example.librarymanage_be.repo.*;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
@@ -27,8 +27,8 @@ public class BookServiceImpl implements BookService {
     private final BookAuthorRepository bookAuthorRepository;
 
     @Override
-
     public BookResponse create(BookRequest bookRequest) {
+        log.info("[BOOK] Creating a new book with title={}",bookRequest.getTitle());
         Book bookMap = bookMapper.toEntity(bookRequest);
         bookMap.setAvailableQuantity(bookRequest.getTotalQuantity());
         bookMap.setPrice(bookRequest.getPrice());
@@ -57,28 +57,37 @@ public class BookServiceImpl implements BookService {
                 .toList();
         bookMap.setBookAuthors(bookAuthors);
         Book savedBook = bookRepository.save(bookMap);
+        log.info("[BOOK] Created book with name={}",savedBook.getTitle());
         return bookMapper.toResponse(savedBook);
     }
 
     @Override
     public Page<BookResponse> getBooks(Pageable pageable) {
+        log.info("[BOOK] Getting books with page={},size={}", pageable.getPageNumber(), pageable.getPageSize());
         Page<Book> books = bookRepository.findAll(pageable);
+        log.info("[BOOK] Found {} publishers", books.getTotalElements());
         return books.map(bookMapper::toResponse);
     }
 
     @Override
     public BookResponse findById(Integer id) {
-        Book book = bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
+        Book book = findBookById(id);
+        log.info("[BOOK] Found successfully a new Author with id={}", book.getBookId());
         return bookMapper.toResponse(book);
     }
 
     @Override
     public Book findBookById(Integer id) {
-        return bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
+        log.info("[BOOK] Finding Book with id={}", id);
+        return bookRepository.findById(id).orElseThrow(() -> {
+            log.error("[AUTHOR] Author not found");
+            return new RuntimeException("Book not found with id: " + id);
+        });
     }
 
     @Override
     public BookResponse update(Integer bookId, BookRequest bookRequest) {
+        log.info("[BOOK] Updating Author with id={}", bookId);
         Book bookExist = findBookById(bookId);
         bookMapper.updateBook(bookExist, bookRequest);
         if (bookRequest.getCategoryId() != null) {
@@ -118,6 +127,7 @@ public class BookServiceImpl implements BookService {
             }
         }
         Book updatedBook = bookRepository.save(bookExist);
+        log.info("[BOOK] Updated successfully a new book with id={},name={}", updatedBook.getBookId(), updatedBook.getTitle());
         return bookMapper.toResponse(updatedBook);
     }
 
@@ -125,5 +135,6 @@ public class BookServiceImpl implements BookService {
     public void delete(Integer bookId) {
         Book bookExisted = findBookById(bookId);
         bookRepository.delete(bookExisted);
+        log.info("[BOOK] Deleted book with id={}", bookId);
     }
 }
