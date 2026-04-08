@@ -31,15 +31,19 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public Page<AuthorResponse> getAuthors(Pageable pageable) {
+        log.info("[AUTHOR] Getting Authors with page={},size={}", pageable.getPageNumber(), pageable.getPageSize());
         Page<Author> authors = authorRepository.findAll(pageable);
+        log.info("[AUTHOR] Found {} Authors", authors.getTotalElements());
         return authors.map(authorMapper::toResponse);
     }
 
     @Override
     public AuthorResponse update(Integer authorId, AuthorRequest authorRequest) {
+        log.info("[AUTHOR] Updating Author with id={}", authorId);
         Author authorExist = findAuthorById(authorId);
         authorMapper.updateEntity(authorRequest, authorExist);
         Author authorUpdated = authorRepository.save(authorExist);
+        log.info("[AUTHOR] Updated successfully a new Author with id={},name={}", authorUpdated.getAuthorId(), authorUpdated.getAuthorName());
         return authorMapper.toResponse(authorUpdated);
     }
 
@@ -51,23 +55,30 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public Author findAuthorById(Integer authorId) {
-        return authorRepository.findById(authorId).
-                orElseThrow(() -> new RuntimeException("Author Not Found"));
+        log.info("[AUTHOR] Finding Author with id={}", authorId);
+        return authorRepository.findById(authorId).orElseThrow(() -> {
+            log.error("[AUTHOR] Author not found");
+            return new RuntimeException("Author Not Found");
+        });
 
     }
 
     @Override
     public AuthorResponse findById(Integer authorId) {
         Author author = findAuthorById(authorId);
+        log.info("[AUTHOR] Found successfully a new Author with id={}", author.getAuthorId());
         return authorMapper.toResponse(author);
     }
 
     @Override
     public List<Author> findAllById(List<Integer> authorIds) {
         if (authorIds == null || authorIds.isEmpty()) {
+            log.warn("[AUTHOR] findALlById called with empty authorIds");
             return List.of();
         }
+        log.info("[AUTHOR] Finding Authors with ids={}", authorIds);
         List<Author> authors = authorRepository.findAllById(authorIds);
+        log.info("[AUTHOR] Found {} Authors", authors.size());
         return authors;
     }
 }
