@@ -9,10 +9,11 @@ import com.example.librarymanage_be.enums.BorrowDetailStatus;
 import com.example.librarymanage_be.enums.BorrowStatus;
 import com.example.librarymanage_be.enums.FineStatus;
 import com.example.librarymanage_be.enums.FineType;
-import com.example.librarymanage_be.model.*;
+import com.example.librarymanage_be.Entity.*;
 import com.example.librarymanage_be.repo.BorrowDetailRepository;
 import com.example.librarymanage_be.repo.BorrowRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -21,6 +22,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BorrowServiceImpl implements BorrowService {
@@ -55,6 +57,7 @@ public class BorrowServiceImpl implements BorrowService {
 
     @Override
     public BorrowResponse borrowBooks(BorrowRequest borrowRequest) {
+        log.info("[BORROW] Borrowing book with userId={}", borrowRequest.getUserId());
         User user = userService.findById(borrowRequest.getUserId());
         Borrow borrow = new Borrow();
         borrow.setUser(user);
@@ -66,6 +69,7 @@ public class BorrowServiceImpl implements BorrowService {
         for (BorrowItemRequest itemRequest : borrowRequest.getItems()) {
             Book book = bookService.findBookById(itemRequest.getBookId());
             if (book.getAvailableQuantity() < itemRequest.getQuantity()) {
+                log.error("[BORROW] Book quantity less than available item quantity={} ", itemRequest.getQuantity());
                 throw new RuntimeException("Không đủ sách: " + book.getTitle());
             }
             book.setAvailableQuantity(book.getAvailableQuantity() - itemRequest.getQuantity());
@@ -78,13 +82,19 @@ public class BorrowServiceImpl implements BorrowService {
             details.add(detail);
         }
         borrowDetailRepository.saveAll(details);
+        log.info("[BORROW] Borrowing successful with borrowId={}", borrow.getBorrowId());
         return toResponse(borrow, details);
     }
 
     @Override
     public void returnBook(Integer borrowDetailId) {
-        BorrowDetail detail = borrowDetailRepository.findById(borrowDetailId).orElseThrow(() -> new RuntimeException("Not found"));
+        BorrowDetail detail = borrowDetailRepository.findById(borrowDetailId).orElseThrow(() -> {
+            log.error("[BORROW_DETAIL] BorrowDetail not found with id={}", borrowDetailId);
+            return new RuntimeException("Not found");
+        });
+
         if (detail.getStatus().equals(BorrowStatus.RETURNED)) {
+            log.error("[BORROW_DETAIL] Borrow already returned");
             throw new RuntimeException("Sách đã trả");
         }
         Book book = detail.getBook();
@@ -113,6 +123,7 @@ public class BorrowServiceImpl implements BorrowService {
             borrow.setStatus(BorrowStatus.RETURNED);
             borrow.setReturnDate(LocalDateTime.now());
             borrowRepository.save(borrow);
+            log.info("[BORROW] Borrow successful with borrowId={}", borrow.getBorrowId());
         }
     }
 
@@ -120,6 +131,7 @@ public class BorrowServiceImpl implements BorrowService {
     public BorrowResponse returnAllBooks(Integer borrowId) {
         Borrow borrow = findById(borrowId);
         if (borrow.getStatus().equals(BorrowStatus.RETURNED)) {
+            log.error("[BORROW_DETAIL] BorrowDetail already returned");
             throw new RuntimeException("Phiếu này đã trả");
         }
         List<BorrowDetail> details = borrowDetailRepository.findByBorrow_BorrowId(borrowId);
@@ -132,11 +144,16 @@ public class BorrowServiceImpl implements BorrowService {
         borrow.setReturnDate(LocalDateTime.now());
         borrow.setStatus(BorrowStatus.RETURNED);
         borrowRepository.save(borrow);
+        log.info("[BORROW] Return successful with borrowId={}", borrow.getBorrowId());
         return toResponse(borrow, details);
     }
 
     @Override
     public Borrow findById(Integer borrowId) {
-        return borrowRepository.findById(borrowId).orElseThrow(() -> new RuntimeException("Không tim thấy phiếu mượn:" + borrowId));
+        log.info("[FIND] Borrowing book with id={}", borrowId);
+        return borrowRepository.findById(borrowId).orElseThrow(() ->{
+            log.error("[FIND] Book not found with id={}", borrowId);
+            return new RuntimeException("Not found");
+        });
     }
 }
