@@ -1,6 +1,6 @@
 package com.example.librarymanage_be.controller;
 
-import com.example.librarymanage_be.model.User;
+import com.example.librarymanage_be.Entity.User;
 import com.example.librarymanage_be.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;

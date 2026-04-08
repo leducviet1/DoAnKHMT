@@ -1,4 +1,4 @@
-package com.example.librarymanage_be.model;
+package com.example.librarymanage_be.Entity;
 
 import jakarta.persistence.*;
 import lombok.*;

@@ -2,7 +2,7 @@ package com.example.librarymanage_be.mapper;
 
 import com.example.librarymanage_be.dto.request.PublisherRequest;
 import com.example.librarymanage_be.dto.response.PublisherResponse;
-import com.example.librarymanage_be.model.Publisher;
+import com.example.librarymanage_be.Entity.Publisher;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
