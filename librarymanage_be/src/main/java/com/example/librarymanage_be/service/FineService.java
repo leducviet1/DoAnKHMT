@@ -3,8 +3,8 @@ package com.example.librarymanage_be.service;
 import com.example.librarymanage_be.dto.request.FineRequest;
 import com.example.librarymanage_be.dto.response.FineResponse;
 import com.example.librarymanage_be.enums.FineType;
-import com.example.librarymanage_be.model.BorrowDetail;
-import com.example.librarymanage_be.model.Fine;
+import com.example.librarymanage_be.Entity.BorrowDetail;
+import com.example.librarymanage_be.Entity.Fine;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

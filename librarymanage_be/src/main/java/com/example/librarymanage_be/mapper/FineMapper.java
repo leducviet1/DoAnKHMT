@@ -2,7 +2,7 @@ package com.example.librarymanage_be.mapper;
 
 import com.example.librarymanage_be.dto.request.FineRequest;
 import com.example.librarymanage_be.dto.response.FineResponse;
-import com.example.librarymanage_be.model.Fine;
+import com.example.librarymanage_be.Entity.Fine;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
