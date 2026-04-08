@@ -3,7 +3,7 @@ package com.example.librarymanage_be.service;
 import com.example.librarymanage_be.dto.request.CategoryRequest;
 import com.example.librarymanage_be.dto.response.CategoryResponse;
 import com.example.librarymanage_be.mapper.CategoryMapper;
-import com.example.librarymanage_be.model.Category;
+import com.example.librarymanage_be.Entity.Category;
 import com.example.librarymanage_be.repo.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
