@@ -6,12 +6,14 @@ import com.example.librarymanage_be.mapper.AuthorMapper;
 import com.example.librarymanage_be.model.Author;
 import com.example.librarymanage_be.repo.AuthorRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthorServiceImpl implements AuthorService {
@@ -20,8 +22,10 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public AuthorResponse create(AuthorRequest authorRequest) {
+        log.info("[AUTHOR] Creating a new Author with name={}", authorRequest.getAuthorName());
         Author authorMapped = authorMapper.toEntity(authorRequest);
         Author authorSaved = authorRepository.save(authorMapped);
+        log.info("[AUTHOR] Created successfully a new Author with name={}", authorRequest.getAuthorName());
         return authorMapper.toResponse(authorSaved);
     }
 
@@ -34,7 +38,7 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     public AuthorResponse update(Integer authorId, AuthorRequest authorRequest) {
         Author authorExist = findAuthorById(authorId);
-        authorMapper.updateEntity(authorRequest,authorExist);
+        authorMapper.updateEntity(authorRequest, authorExist);
         Author authorUpdated = authorRepository.save(authorExist);
         return authorMapper.toResponse(authorUpdated);
     }
@@ -48,7 +52,7 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     public Author findAuthorById(Integer authorId) {
         return authorRepository.findById(authorId).
-                orElseThrow(()-> new RuntimeException("Author Not Found"));
+                orElseThrow(() -> new RuntimeException("Author Not Found"));
 
     }
 
@@ -58,15 +62,12 @@ public class AuthorServiceImpl implements AuthorService {
         return authorMapper.toResponse(author);
     }
 
-
     @Override
     public List<Author> findAllById(List<Integer> authorIds) {
-        if(authorIds == null || authorIds.isEmpty()){
+        if (authorIds == null || authorIds.isEmpty()) {
             return List.of();
         }
         List<Author> authors = authorRepository.findAllById(authorIds);
         return authors;
     }
-
-
 }
