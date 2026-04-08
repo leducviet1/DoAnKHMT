@@ -3,7 +3,7 @@ package com.example.librarymanage_be.service;
 import com.example.librarymanage_be.dto.request.AuthorRequest;
 import com.example.librarymanage_be.dto.response.AuthorResponse;
 import com.example.librarymanage_be.mapper.AuthorMapper;
-import com.example.librarymanage_be.model.Author;
+import com.example.librarymanage_be.Entity.Author;
 import com.example.librarymanage_be.repo.AuthorRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +51,7 @@ public class AuthorServiceImpl implements AuthorService {
     public void delete(Integer authorId) {
         Author authorExist = findAuthorById(authorId);
         authorRepository.delete(authorExist);
+        log.info("[AUTHOR] Deleted Author with id={}", authorId);
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.example.librarymanage_be.controller;
 
 import com.example.librarymanage_be.dto.request.AuthorRequest;
 import com.example.librarymanage_be.dto.response.AuthorResponse;
-import com.example.librarymanage_be.model.Author;
 import com.example.librarymanage_be.service.AuthorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
