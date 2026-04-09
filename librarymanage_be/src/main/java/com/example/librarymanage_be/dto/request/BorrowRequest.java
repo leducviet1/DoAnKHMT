@@ -1,11 +1,9 @@
 package com.example.librarymanage_be.dto.request;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.List;
-@Getter
-@Setter
+@Data
 public class BorrowRequest {
     private Integer userId;
     private List<BorrowItemRequest> items;

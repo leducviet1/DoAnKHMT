@@ -2,13 +2,9 @@ package com.example.librarymanage_be.dto.request;
 
 import com.example.librarymanage_be.enums.FineStatus;
 import com.example.librarymanage_be.enums.FineType;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-import java.math.BigDecimal;
-
-@Getter
-@Setter
+@Data
 public class FineRequest {
     private Integer borrowDetailId;
     private String reason;

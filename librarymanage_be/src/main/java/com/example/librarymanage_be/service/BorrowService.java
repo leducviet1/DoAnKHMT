@@ -2,8 +2,8 @@ package com.example.librarymanage_be.service;
 
 import com.example.librarymanage_be.dto.request.BorrowRequest;
 import com.example.librarymanage_be.dto.response.BorrowResponse;
-import com.example.librarymanage_be.Entity.Borrow;
-import com.example.librarymanage_be.Entity.BorrowDetail;
+import com.example.librarymanage_be.entity.Borrow;
+import com.example.librarymanage_be.entity.BorrowDetail;
 
 import java.util.List;
 

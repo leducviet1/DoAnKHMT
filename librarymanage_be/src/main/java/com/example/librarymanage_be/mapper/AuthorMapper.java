@@ -2,7 +2,7 @@ package com.example.librarymanage_be.mapper;
 
 import com.example.librarymanage_be.dto.request.AuthorRequest;
 import com.example.librarymanage_be.dto.response.AuthorResponse;
-import com.example.librarymanage_be.Entity.Author;
+import com.example.librarymanage_be.entity.Author;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

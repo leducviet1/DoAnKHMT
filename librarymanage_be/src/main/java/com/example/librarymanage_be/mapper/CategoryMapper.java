@@ -2,7 +2,7 @@ package com.example.librarymanage_be.mapper;
 
 import com.example.librarymanage_be.dto.request.CategoryRequest;
 import com.example.librarymanage_be.dto.response.CategoryResponse;
-import com.example.librarymanage_be.Entity.Category;
+import com.example.librarymanage_be.entity.Category;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

@@ -2,7 +2,7 @@ package com.example.librarymanage_be.controller;
 
 import com.example.librarymanage_be.dto.request.PublisherRequest;
 import com.example.librarymanage_be.dto.response.PublisherResponse;
-import com.example.librarymanage_be.Entity.Publisher;
+import com.example.librarymanage_be.entity.Publisher;
 import com.example.librarymanage_be.service.PublisherService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

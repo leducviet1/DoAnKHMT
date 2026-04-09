@@ -1,11 +1,10 @@
-package com.example.librarymanage_be.Entity;
+package com.example.librarymanage_be.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Getter
-@Setter
+@Data
 @IdClass(BookAuthorId.class)
 @NoArgsConstructor
 @AllArgsConstructor

@@ -2,8 +2,8 @@ package com.example.librarymanage_be.mapper;
 
 import com.example.librarymanage_be.dto.request.BookRequest;
 import com.example.librarymanage_be.dto.response.BookResponse;
-import com.example.librarymanage_be.Entity.Book;
-import com.example.librarymanage_be.Entity.BookAuthor;
+import com.example.librarymanage_be.entity.Book;
+import com.example.librarymanage_be.entity.BookAuthor;
 import org.mapstruct.*;
 
 import java.util.List;

@@ -1,13 +1,10 @@
 package com.example.librarymanage_be.dto.response;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
-@Getter
-@Setter
+@Data
 public class BorrowResponse {
     private Integer borrowId;
     private Integer userId;

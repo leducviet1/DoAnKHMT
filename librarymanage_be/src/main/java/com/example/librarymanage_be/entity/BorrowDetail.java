@@ -1,16 +1,14 @@
-package com.example.librarymanage_be.Entity;
+package com.example.librarymanage_be.entity;
 
 import com.example.librarymanage_be.enums.BorrowDetailStatus;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "borrow_details")
-@Getter
-@Setter
+@Data
 public class BorrowDetail {
 
     @Id

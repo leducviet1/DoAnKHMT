@@ -1,6 +1,6 @@
 package com.example.librarymanage_be.service;
 
-import com.example.librarymanage_be.Entity.User;
+import com.example.librarymanage_be.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

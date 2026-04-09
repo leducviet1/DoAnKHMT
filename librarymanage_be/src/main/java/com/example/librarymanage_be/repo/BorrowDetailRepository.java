@@ -1,6 +1,6 @@
 package com.example.librarymanage_be.repo;
 
-import com.example.librarymanage_be.Entity.BorrowDetail;
+import com.example.librarymanage_be.entity.BorrowDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

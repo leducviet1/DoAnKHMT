@@ -9,7 +9,7 @@ import com.example.librarymanage_be.enums.BorrowDetailStatus;
 import com.example.librarymanage_be.enums.BorrowStatus;
 import com.example.librarymanage_be.enums.FineStatus;
 import com.example.librarymanage_be.enums.FineType;
-import com.example.librarymanage_be.Entity.*;
+import com.example.librarymanage_be.entity.*;
 import com.example.librarymanage_be.repo.BorrowDetailRepository;
 import com.example.librarymanage_be.repo.BorrowRepository;
 import lombok.RequiredArgsConstructor;

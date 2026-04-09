@@ -6,8 +6,6 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
 @Builder
 public class AuthorRequest {
     @NotBlank(message = "Không được để trống tên tác giả")

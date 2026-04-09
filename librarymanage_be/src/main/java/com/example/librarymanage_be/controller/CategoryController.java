@@ -2,7 +2,7 @@ package com.example.librarymanage_be.controller;
 
 import com.example.librarymanage_be.dto.request.CategoryRequest;
 import com.example.librarymanage_be.dto.response.CategoryResponse;
-import com.example.librarymanage_be.Entity.Category;
+import com.example.librarymanage_be.entity.Category;
 import com.example.librarymanage_be.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping("/api/categories")
 @RequiredArgsConstructor
 public class CategoryController {

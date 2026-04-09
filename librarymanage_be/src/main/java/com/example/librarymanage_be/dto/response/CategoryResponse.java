@@ -3,8 +3,6 @@ package com.example.librarymanage_be.dto.response;
 import lombok.*;
 
 @Data
-@Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

@@ -2,7 +2,7 @@ package com.example.librarymanage_be.service;
 
 import com.example.librarymanage_be.dto.request.BookRequest;
 import com.example.librarymanage_be.dto.response.BookResponse;
-import com.example.librarymanage_be.Entity.Book;
+import com.example.librarymanage_be.entity.Book;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

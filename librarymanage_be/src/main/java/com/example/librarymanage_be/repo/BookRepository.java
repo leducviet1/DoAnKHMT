@@ -1,6 +1,6 @@
 package com.example.librarymanage_be.repo;
 
-import com.example.librarymanage_be.Entity.Book;
+import com.example.librarymanage_be.entity.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 

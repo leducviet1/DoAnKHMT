@@ -1,17 +1,15 @@
-package com.example.librarymanage_be.Entity;
+package com.example.librarymanage_be.entity;
 
 import com.example.librarymanage_be.enums.BorrowStatus;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Table(name = "borrows")
-@Getter
-@Setter
+@Data
 public class Borrow {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

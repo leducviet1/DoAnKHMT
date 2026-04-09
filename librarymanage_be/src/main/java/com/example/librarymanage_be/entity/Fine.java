@@ -1,17 +1,15 @@
-package com.example.librarymanage_be.Entity;
+package com.example.librarymanage_be.entity;
 
 import com.example.librarymanage_be.enums.FineStatus;
 import com.example.librarymanage_be.enums.FineType;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Table(name = "fines")
 public class Fine {
     @Id

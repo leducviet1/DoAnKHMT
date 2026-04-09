@@ -1,13 +1,9 @@
-package com.example.librarymanage_be.Entity;
+package com.example.librarymanage_be.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookAuthorId implements Serializable {

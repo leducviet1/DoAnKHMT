@@ -1,4 +1,4 @@
-package com.example.librarymanage_be.Entity;
+package com.example.librarymanage_be.entity;
 
 import com.example.librarymanage_be.enums.BookStatus;
 import jakarta.persistence.*;
@@ -8,8 +8,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "books")

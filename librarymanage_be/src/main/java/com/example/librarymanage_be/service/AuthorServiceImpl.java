@@ -3,7 +3,7 @@ package com.example.librarymanage_be.service;
 import com.example.librarymanage_be.dto.request.AuthorRequest;
 import com.example.librarymanage_be.dto.response.AuthorResponse;
 import com.example.librarymanage_be.mapper.AuthorMapper;
-import com.example.librarymanage_be.Entity.Author;
+import com.example.librarymanage_be.entity.Author;
 import com.example.librarymanage_be.repo.AuthorRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

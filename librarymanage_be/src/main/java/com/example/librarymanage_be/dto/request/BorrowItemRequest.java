@@ -1,10 +1,7 @@
 package com.example.librarymanage_be.dto.request;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
+import lombok.Data;
+@Data
 public class BorrowItemRequest {
     private Integer bookId;
     private Integer quantity;
