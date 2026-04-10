@@ -77,7 +77,6 @@ public class AuthorServiceImpl implements AuthorService {
             log.warn("[AUTHOR] findALlById called with empty authorIds");
             return List.of();
         }
-        log.info("[AUTHOR] Finding Authors with ids={}", authorIds);
         List<Author> authors = authorRepository.findAllById(authorIds);
         log.info("[AUTHOR] Found {} Authors", authors.size());
         return authors;

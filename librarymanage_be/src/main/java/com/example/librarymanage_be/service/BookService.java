@@ -7,11 +7,38 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface BookService {
+    // search, find-all, create, update, update 1 phan (patch), delete
+
+    /**
+     * Tìm kiếm sách theo title, tên thể loại, tên tác giả
+     */
+    Page<BookResponse> searchBooks(String title, String categoryName, String authorName, Pageable pageable);
+
+    /**
+     *
+     * Tạo sách mới
+     */
     BookResponse create(BookRequest bookRequest);
+
+    /**
+     * Lấy danh sách sách có phân trang
+     */
     Page<BookResponse> getBooks(Pageable pageable);
+
+    /**
+     * Lấy thông tin sách chi tiết theo id
+     */
     BookResponse findById(Integer id);
-    Book findBookById(Integer id);
-    BookResponse update(Integer bookId,BookRequest bookRequest);
-    void  delete(Integer bookId);
-    Page<BookResponse> searchBooks(String title, String categoryName, String authorName,Pageable pageable);
+
+
+    /**
+     * Cập nhật sách
+     */
+    BookResponse update(Integer bookId, BookRequest bookRequest);
+
+    /**
+     * Xóa sách theo id
+     */
+    void delete(Integer bookId);
+
 }

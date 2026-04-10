@@ -8,8 +8,12 @@ import org.springframework.data.domain.Pageable;
 
 public interface PublisherService {
     PublisherResponse createPublisher(PublisherRequest publisherRequest);
+
     Page<PublisherResponse> getPublishers(Pageable pageable);
-    PublisherResponse updatePublisher(Integer id,PublisherRequest publisherRequest);
+
+    PublisherResponse updatePublisher(Integer id, PublisherRequest publisherRequest);
+
     void deletePublisher(Integer id);
+
     Publisher findById(Integer id);
 }

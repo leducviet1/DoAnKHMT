@@ -9,6 +9,7 @@ import com.example.librarymanage_be.entity.Book;
 import com.example.librarymanage_be.entity.BookAuthor;
 import com.example.librarymanage_be.repo.*;
 import com.example.librarymanage_be.specification.BookSpecification;
+import com.example.librarymanage_be.utils.EntityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -63,6 +64,7 @@ public class BookServiceImpl implements BookService {
         return bookMapper.toResponse(savedBook);
     }
 
+
     @Override
     public Page<BookResponse> getBooks(Pageable pageable) {
         log.info("[BOOK] Getting books with page={},size={}", pageable.getPageNumber(), pageable.getPageSize());
@@ -73,24 +75,17 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookResponse findById(Integer id) {
-        Book book = findBookById(id);
+        Book book = EntityUtils.getOrThrow(bookRepository.findById(id),"Book not found");
         log.info("[BOOK] Found successfully a new Author with id={}", book.getBookId());
         return bookMapper.toResponse(book);
     }
 
-    @Override
-    public Book findBookById(Integer id) {
-        log.info("[BOOK] Finding Book with id={}", id);
-        return bookRepository.findById(id).orElseThrow(() -> {
-            log.error("[AUTHOR] Author not found");
-            return new RuntimeException("Book not found with id: " + id);
-        });
-    }
+
 
     @Override
     public BookResponse update(Integer bookId, BookRequest bookRequest) {
         log.info("[BOOK] Updating Author with id={}", bookId);
-        Book bookExist = findBookById(bookId);
+        Book bookExist = EntityUtils.getOrThrow(bookRepository.findById(bookId),"Book not found");
         bookMapper.updateBook(bookExist, bookRequest);
         if (bookRequest.getCategoryId() != null) {
             bookExist.setCategory(categoryService.findById(bookRequest.getCategoryId()));
@@ -135,7 +130,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public void delete(Integer bookId) {
-        Book bookExisted = findBookById(bookId);
+        Book bookExisted = EntityUtils.getOrThrow(bookRepository.findById(bookId),"Book not found");
         bookRepository.delete(bookExisted);
         log.info("[BOOK] Deleted book with id={}", bookId);
     }

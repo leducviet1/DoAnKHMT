@@ -12,8 +12,12 @@ import java.math.BigDecimal;
 
 public interface FineService {
     FineResponse create(FineRequest fineRequest);
+
     Page<FineResponse> getFines(Pageable pageable);
+
     BigDecimal calculateAmount(FineType fineType, BorrowDetail borrowDetail);
+
     void pay(Integer fineId);
+
     Fine findById(Integer fineId);
 }
