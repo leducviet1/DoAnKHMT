@@ -13,4 +13,5 @@ public interface BookService {
     Book findBookById(Integer id);
     BookResponse update(Integer bookId,BookRequest bookRequest);
     void  delete(Integer bookId);
+    Page<BookResponse> searchBooks(String title, String categoryName, String authorName,Pageable pageable);
 }

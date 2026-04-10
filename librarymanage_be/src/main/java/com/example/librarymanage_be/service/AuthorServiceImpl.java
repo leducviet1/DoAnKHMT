@@ -43,7 +43,7 @@ public class AuthorServiceImpl implements AuthorService {
         Author authorExist = findAuthorById(authorId);
         authorMapper.updateEntity(authorRequest, authorExist);
         Author authorUpdated = authorRepository.save(authorExist);
-        log.info("[AUTHOR] Updated successfully a new Author with id={},name={}", authorUpdated.getAuthorId(), authorUpdated.getAuthorName());
+        log.info("[AUTHOR] Updated successfully author with id={},name={}", authorUpdated.getAuthorId(), authorUpdated.getAuthorName());
         return authorMapper.toResponse(authorUpdated);
     }
 

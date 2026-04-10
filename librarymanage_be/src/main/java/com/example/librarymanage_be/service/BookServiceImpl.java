@@ -8,10 +8,12 @@ import com.example.librarymanage_be.entity.Author;
 import com.example.librarymanage_be.entity.Book;
 import com.example.librarymanage_be.entity.BookAuthor;
 import com.example.librarymanage_be.repo.*;
+import com.example.librarymanage_be.specification.BookSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -136,5 +138,21 @@ public class BookServiceImpl implements BookService {
         Book bookExisted = findBookById(bookId);
         bookRepository.delete(bookExisted);
         log.info("[BOOK] Deleted book with id={}", bookId);
+    }
+
+    @Override
+    public Page<BookResponse> searchBooks(String title, String categoryName, String authorName, Pageable pageable) {
+        Specification<Book> spec = (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
+        if (title != null) {
+            spec = spec.and(BookSpecification.hasTitle(title));
+        }
+        if (categoryName != null) {
+            spec = spec.and(BookSpecification.hasCategory(categoryName));
+        }
+        if (authorName != null) {
+            spec = spec.and(BookSpecification.hasAuthor(authorName));
+        }
+        Page<Book> books = bookRepository.findAll(spec, pageable);
+        return books.map(bookMapper::toResponse);
     }
 }
