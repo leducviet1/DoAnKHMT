@@ -47,7 +47,7 @@ public class BookServiceImpl implements BookService {
                 .distinct()
                 .toList();
 
-        List<Author> authors = authorService.findAllById(authorIds);
+        List<Author> authors = authorService.findListAuthorsById(authorIds);
 
         List<BookAuthor> bookAuthors = authors.stream()
                 .map(author -> {
@@ -108,7 +108,7 @@ public class BookServiceImpl implements BookService {
             bookAuthorRepository.deleteByBook_BookId(bookId);
             bookAuthorRepository.flush();
             //Lấy author mới
-            List<Author> authors = authorService.findAllById(authorIds);
+            List<Author> authors = authorService.findListAuthorsById(authorIds);
             List<BookAuthor> bookAuthors = authors.stream().map(author -> {
                 BookAuthor ba = new BookAuthor();
                 ba.setBook(bookExist);

@@ -72,7 +72,7 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public List<Author> findAllById(List<Integer> authorIds) {
+    public List<Author> findListAuthorsById(List<Integer> authorIds) {
         if (authorIds == null || authorIds.isEmpty()) {
             log.warn("[AUTHOR] findALlById called with empty authorIds");
             return List.of();
