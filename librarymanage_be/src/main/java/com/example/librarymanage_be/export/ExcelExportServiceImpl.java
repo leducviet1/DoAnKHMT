@@ -48,7 +48,7 @@ public class ExcelExportServiceImpl implements ExcelExportService {
         }
         workbook.write(fileOutputStream);
         fileOutputStream.close();
+        workbook.dispose(); //Xóa file tạm
         workbook.close();
-
     }
 }
