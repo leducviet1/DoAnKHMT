@@ -4,8 +4,9 @@ import lombok.Data;
 
 @Data
 public class BorrowDetailResponse {
-    private Integer bookId;
+    private Integer id;
     private String title;
     private Integer quantity;
     private String note;
+    private String status;
 }

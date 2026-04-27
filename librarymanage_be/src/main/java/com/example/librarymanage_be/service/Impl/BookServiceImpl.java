@@ -1,23 +1,31 @@
-package com.example.librarymanage_be.service;
+package com.example.librarymanage_be.service.Impl;
 
 import com.example.librarymanage_be.dto.request.BookRequest;
 import com.example.librarymanage_be.dto.response.BookResponse;
+import com.example.librarymanage_be.dto.response.BookSuggestionResponse;
 import com.example.librarymanage_be.enums.BookStatus;
 import com.example.librarymanage_be.mapper.BookMapper;
 import com.example.librarymanage_be.entity.Author;
 import com.example.librarymanage_be.entity.Book;
 import com.example.librarymanage_be.entity.BookAuthor;
 import com.example.librarymanage_be.repo.*;
+import com.example.librarymanage_be.service.AuthorService;
+import com.example.librarymanage_be.service.BookService;
+import com.example.librarymanage_be.service.CategoryService;
+import com.example.librarymanage_be.service.PublisherService;
 import com.example.librarymanage_be.specification.BookSpecification;
 import com.example.librarymanage_be.utils.EntityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Locale;
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -75,11 +83,18 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookResponse findById(Integer id) {
-        Book book = EntityUtils.getOrThrow(bookRepository.findById(id),"Book not found");
+        Book book = getEntityById(id);
         log.info("[BOOK] Found successfully a new Author with id={}", book.getBookId());
         return bookMapper.toResponse(book);
     }
 
+    @Override
+    public Book getEntityById(Integer id) {
+        return EntityUtils.getOrThrow(
+                bookRepository.findById(id),
+                "Book not found with id=" + id
+        );
+    }
 
 
     @Override
@@ -149,5 +164,35 @@ public class BookServiceImpl implements BookService {
         }
         Page<Book> books = bookRepository.findAll(spec, pageable);
         return books.map(bookMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BookSuggestionResponse> suggestBooks(String keyword, int limit) {
+        if (keyword == null || keyword.isBlank()) {
+            return List.of();
+        }
+
+        int safeLimit = Math.max(1, Math.min(limit, 20));
+        String normalizedKeyword = keyword.trim().toLowerCase(Locale.ROOT);
+        return bookRepository.findSuggestions(normalizedKeyword, PageRequest.of(0, safeLimit))
+                .stream()
+                .map(this::toSuggestionResponse)
+                .toList();
+    }
+
+    private BookSuggestionResponse toSuggestionResponse(Book book) {
+        List<String> authorNames = book.getBookAuthors() == null ? List.of() : book.getBookAuthors().stream()
+                .map(bookAuthor -> bookAuthor.getAuthor().getAuthorName())
+                .toList();
+
+        return new BookSuggestionResponse(
+                book.getBookId(),
+                book.getTitle(),
+                book.getCategory() == null ? null : book.getCategory().getCategoryName(),
+                authorNames,
+                book.getAvailableQuantity(),
+                book.getBookStatus()
+        );
     }
 }

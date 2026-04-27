@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,13 +15,18 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/fines")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class FineController {
     private final FineService fineService;
     @GetMapping()
     public ResponseEntity<Page<FineResponse>> getFines(@RequestParam(defaultValue = "0") int page,
-                                                       @RequestParam(defaultValue = "5") int size){
+                                                       @RequestParam(defaultValue = "5") int size,
+                                                       Authentication authentication){
         Pageable pageable =  PageRequest.of(page, size);
-        return ResponseEntity.ok(fineService.getFines(pageable));
+        boolean canViewAll = authentication.getAuthorities().stream()
+                .map(grantedAuthority -> grantedAuthority.getAuthority())
+                .anyMatch(authority -> authority.equals("ADMIN") || authority.equals("LIBRARIAN"));
+        return ResponseEntity.ok(fineService.getFines(pageable, authentication.getName(), canViewAll));
 
     }
 

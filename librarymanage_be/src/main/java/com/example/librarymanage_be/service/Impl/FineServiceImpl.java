@@ -1,4 +1,4 @@
-package com.example.librarymanage_be.service;
+package com.example.librarymanage_be.service.Impl;
 
 import com.example.librarymanage_be.config.FineConfig;
 import com.example.librarymanage_be.dto.request.FineRequest;
@@ -9,6 +9,8 @@ import com.example.librarymanage_be.mapper.FineMapper;
 import com.example.librarymanage_be.entity.BorrowDetail;
 import com.example.librarymanage_be.entity.Fine;
 import com.example.librarymanage_be.repo.FineRepository;
+import com.example.librarymanage_be.service.BorrowDetailService;
+import com.example.librarymanage_be.service.FineService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -44,6 +46,17 @@ public class FineServiceImpl implements FineService {
         log.info("[FINE] Getting fines for page={},size={}",pageable.getPageNumber(),pageable.getPageSize());
         Page<Fine> fines = fineRepository.findAll(pageable);
         log.info("[FINE] Found {} fines",fines.getTotalElements());
+        return fines.map(fineMapper::toResponse);
+    }
+
+    @Override
+    public Page<FineResponse> getFines(Pageable pageable, String email, boolean canViewAll) {
+        log.info("[FINE] Getting fines for email={}, page={}, size={}, canViewAll={}",
+                email, pageable.getPageNumber(), pageable.getPageSize(), canViewAll);
+        Page<Fine> fines = canViewAll
+                ? fineRepository.findAll(pageable)
+                : fineRepository.findByBorrowDetail_Borrow_User_Email(email, pageable);
+        log.info("[FINE] Found {} fines", fines.getTotalElements());
         return fines.map(fineMapper::toResponse);
     }
 

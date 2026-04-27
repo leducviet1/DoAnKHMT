@@ -15,6 +15,8 @@ public interface FineService {
 
     Page<FineResponse> getFines(Pageable pageable);
 
+    Page<FineResponse> getFines(Pageable pageable, String email, boolean canViewAll);
+
     BigDecimal calculateAmount(FineType fineType, BorrowDetail borrowDetail);
 
     void pay(Integer fineId);

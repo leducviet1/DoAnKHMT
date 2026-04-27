@@ -1,10 +1,11 @@
-package com.example.librarymanage_be.service;
+package com.example.librarymanage_be.service.Impl;
 
 import com.example.librarymanage_be.dto.request.PublisherRequest;
 import com.example.librarymanage_be.dto.response.PublisherResponse;
 import com.example.librarymanage_be.mapper.PublisherMapper;
 import com.example.librarymanage_be.entity.Publisher;
 import com.example.librarymanage_be.repo.PublisherRepository;
+import com.example.librarymanage_be.service.PublisherService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

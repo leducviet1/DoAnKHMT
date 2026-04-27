@@ -1,7 +1,8 @@
-package com.example.librarymanage_be.service;
+package com.example.librarymanage_be.service.Impl;
 
 import com.example.librarymanage_be.entity.BorrowDetail;
 import com.example.librarymanage_be.repo.BorrowDetailRepository;
+import com.example.librarymanage_be.service.BorrowDetailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

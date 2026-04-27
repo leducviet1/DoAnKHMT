@@ -1,10 +1,11 @@
-package com.example.librarymanage_be.service;
+package com.example.librarymanage_be.service.Impl;
 
 import com.example.librarymanage_be.dto.request.CategoryRequest;
 import com.example.librarymanage_be.dto.response.CategoryResponse;
 import com.example.librarymanage_be.mapper.CategoryMapper;
 import com.example.librarymanage_be.entity.Category;
 import com.example.librarymanage_be.repo.CategoryRepository;
+import com.example.librarymanage_be.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

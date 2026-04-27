@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/authors")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class AuthorController {
     private final AuthorService authorService;
 
