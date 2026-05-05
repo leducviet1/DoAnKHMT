@@ -10,26 +10,24 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookRequest {
-    @NotBlank(message = "Không được để trống tên sách")
-    @Size(max = 255,message = "Không được quá 255 kí tự")
+    @NotBlank(message = "Khong duoc de trong ten sach")
+    @Size(max = 255, message = "Khong duoc qua 255 ky tu")
     private String title;
-    @NotNull(message = "Phải có tổng số lượng sách")
+
+    @NotNull(message = "Phai co tong so luong sach")
     private Integer totalQuantity;
 
     private BigDecimal price;
-
     private Integer availableQuantity;
-
     private String description;
-
     private List<Integer> authorIds;
-
+    private List<String> newAuthorNames;
     private Integer categoryId;
-
     private Integer publisherId;
 }

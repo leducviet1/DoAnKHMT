@@ -3,12 +3,13 @@ package com.example.librarymanage_be.service.Impl;
 import com.example.librarymanage_be.dto.request.BookRequest;
 import com.example.librarymanage_be.dto.response.BookResponse;
 import com.example.librarymanage_be.dto.response.BookSuggestionResponse;
-import com.example.librarymanage_be.enums.BookStatus;
-import com.example.librarymanage_be.mapper.BookMapper;
 import com.example.librarymanage_be.entity.Author;
 import com.example.librarymanage_be.entity.Book;
 import com.example.librarymanage_be.entity.BookAuthor;
-import com.example.librarymanage_be.repo.*;
+import com.example.librarymanage_be.enums.BookStatus;
+import com.example.librarymanage_be.mapper.BookMapper;
+import com.example.librarymanage_be.repo.BookAuthorRepository;
+import com.example.librarymanage_be.repo.BookRepository;
 import com.example.librarymanage_be.service.AuthorService;
 import com.example.librarymanage_be.service.BookService;
 import com.example.librarymanage_be.service.CategoryService;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Locale;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -39,69 +41,45 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookResponse create(BookRequest bookRequest) {
-        log.info("[BOOK] Creating a new book with title={}",bookRequest.getTitle());
-        Book bookMap = bookMapper.toEntity(bookRequest);
-        bookMap.setAvailableQuantity(bookRequest.getTotalQuantity());
-        bookMap.setPrice(bookRequest.getPrice());
-        if (bookMap.getAvailableQuantity() > 0) {
-            bookMap.setBookStatus(BookStatus.AVAILABLE);
-        } else {
-            bookMap.setBookStatus(BookStatus.INACTIVE);
+        log.info("[BOOK] Creating a new book with title={}", bookRequest.getTitle());
+        Book book = bookMapper.toEntity(bookRequest);
+        book.setAvailableQuantity(bookRequest.getTotalQuantity());
+        book.setPrice(bookRequest.getPrice());
+        book.setBookStatus(book.getAvailableQuantity() > 0 ? BookStatus.AVAILABLE : BookStatus.INACTIVE);
+        book.setCategory(categoryService.findById(bookRequest.getCategoryId()));
+        book.setPublisher(publisherService.findById(bookRequest.getPublisherId()));
+
+        List<Author> authors = authorService.resolveAuthors(bookRequest.getAuthorIds(), bookRequest.getNewAuthorNames());
+        if (authors.isEmpty()) {
+            throw new RuntimeException("Book must have at least one author");
         }
-        bookMap.setCategory(categoryService.findById(bookRequest.getCategoryId()));
-        bookMap.setPublisher(publisherService.findById(bookRequest.getPublisherId()));
 
-        List<Integer> authorIds = bookRequest.getAuthorIds()
-                .stream()
-                .distinct()
-                .toList();
-
-        List<Author> authors = authorService.findListAuthorsById(authorIds);
-
-        List<BookAuthor> bookAuthors = authors.stream()
-                .map(author -> {
-                    BookAuthor ba = new BookAuthor();
-                    ba.setBook(bookMap);
-                    ba.setAuthor(author);
-                    return ba;
-                })
-                .toList();
-        bookMap.setBookAuthors(bookAuthors);
-        Book savedBook = bookRepository.save(bookMap);
-        log.info("[BOOK] Created book with name={}",savedBook.getTitle());
+        book.setBookAuthors(buildBookAuthors(book, authors));
+        Book savedBook = bookRepository.save(book);
         return bookMapper.toResponse(savedBook);
     }
 
-
     @Override
     public Page<BookResponse> getBooks(Pageable pageable) {
-        log.info("[BOOK] Getting books with page={},size={}", pageable.getPageNumber(), pageable.getPageSize());
         Page<Book> books = bookRepository.findAll(pageable);
-        log.info("[BOOK] Found {} publishers", books.getTotalElements());
         return books.map(bookMapper::toResponse);
     }
 
     @Override
     public BookResponse findById(Integer id) {
-        Book book = getEntityById(id);
-        log.info("[BOOK] Found successfully a new Author with id={}", book.getBookId());
-        return bookMapper.toResponse(book);
+        return bookMapper.toResponse(getEntityById(id));
     }
 
     @Override
     public Book getEntityById(Integer id) {
-        return EntityUtils.getOrThrow(
-                bookRepository.findById(id),
-                "Book not found with id=" + id
-        );
+        return EntityUtils.getOrThrow(bookRepository.findById(id), "Book not found with id=" + id);
     }
-
 
     @Override
     public BookResponse update(Integer bookId, BookRequest bookRequest) {
-        log.info("[BOOK] Updating Author with id={}", bookId);
-        Book bookExist = EntityUtils.getOrThrow(bookRepository.findById(bookId),"Book not found");
+        Book bookExist = EntityUtils.getOrThrow(bookRepository.findById(bookId), "Book not found");
         bookMapper.updateBook(bookExist, bookRequest);
+
         if (bookRequest.getCategoryId() != null) {
             bookExist.setCategory(categoryService.findById(bookRequest.getCategoryId()));
         }
@@ -109,45 +87,28 @@ public class BookServiceImpl implements BookService {
             bookExist.setPublisher(publisherService.findById(bookRequest.getPublisherId()));
         }
 
-        if (bookRequest.getAuthorIds() != null) {
-
-            List<Integer> authorIds = bookRequest.getAuthorIds()
-                    .stream()
-                    .distinct()
-                    .toList();
+        if (hasAuthorPayload(bookRequest)) {
+            List<Author> authors = authorService.resolveAuthors(bookRequest.getAuthorIds(), bookRequest.getNewAuthorNames());
             bookAuthorRepository.deleteByBook_BookId(bookId);
             bookAuthorRepository.flush();
-            //Lấy author mới
-            List<Author> authors = authorService.findListAuthorsById(authorIds);
-            List<BookAuthor> bookAuthors = authors.stream().map(author -> {
-                BookAuthor ba = new BookAuthor();
-                ba.setBook(bookExist);
-                ba.setAuthor(author);
-                return ba;
-            }).toList();
-            bookAuthorRepository.saveAll(bookAuthors);
+            bookAuthorRepository.saveAll(buildBookAuthors(bookExist, authors));
         }
+
         bookExist.setPrice(bookRequest.getPrice());
         if (bookRequest.getTotalQuantity() != null) {
             Integer borrowed = bookExist.getTotalQuantity() - bookExist.getAvailableQuantity();
             bookExist.setTotalQuantity(bookRequest.getTotalQuantity());
             bookExist.setAvailableQuantity(bookRequest.getTotalQuantity() - borrowed);
-            if (bookExist.getAvailableQuantity() > 0) {
-                bookExist.setBookStatus(BookStatus.AVAILABLE);
-            } else {
-                bookExist.setBookStatus(BookStatus.OUT_OF_STOCK);
-            }
+            bookExist.setBookStatus(bookExist.getAvailableQuantity() > 0 ? BookStatus.AVAILABLE : BookStatus.OUT_OF_STOCK);
         }
+
         Book updatedBook = bookRepository.save(bookExist);
-        log.info("[BOOK] Updated successfully a new book with id={},name={}", updatedBook.getBookId(), updatedBook.getTitle());
         return bookMapper.toResponse(updatedBook);
     }
 
     @Override
     public void delete(Integer bookId) {
-        Book bookExisted = EntityUtils.getOrThrow(bookRepository.findById(bookId),"Book not found");
-        bookRepository.delete(bookExisted);
-        log.info("[BOOK] Deleted book with id={}", bookId);
+        bookRepository.delete(EntityUtils.getOrThrow(bookRepository.findById(bookId), "Book not found"));
     }
 
     @Override
@@ -162,8 +123,7 @@ public class BookServiceImpl implements BookService {
         if (authorName != null) {
             spec = spec.and(BookSpecification.hasAuthor(authorName));
         }
-        Page<Book> books = bookRepository.findAll(spec, pageable);
-        return books.map(bookMapper::toResponse);
+        return bookRepository.findAll(spec, pageable).map(bookMapper::toResponse);
     }
 
     @Override
@@ -194,5 +154,20 @@ public class BookServiceImpl implements BookService {
                 book.getAvailableQuantity(),
                 book.getBookStatus()
         );
+    }
+
+    private List<BookAuthor> buildBookAuthors(Book book, List<Author> authors) {
+        return authors.stream()
+                .map(author -> {
+                    BookAuthor bookAuthor = new BookAuthor();
+                    bookAuthor.setBook(book);
+                    bookAuthor.setAuthor(author);
+                    return bookAuthor;
+                })
+                .toList();
+    }
+
+    private boolean hasAuthorPayload(BookRequest bookRequest) {
+        return bookRequest.getAuthorIds() != null || bookRequest.getNewAuthorNames() != null;
     }
 }
